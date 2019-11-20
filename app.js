@@ -1,25 +1,23 @@
 const express = require("express");
 const apiRouter = require("./Routes/apiRouter");
-
+const {
+  routeNotExist,
+  badRequest,
+  notFound,
+  serverError,
+  noContent,
+  unprocessableEntity
+} = require("./errorHandling");
 const app = express();
 
 app.use(express.json());
 app.use("/api", apiRouter);
 
-app.all("/*", (req, res, next) => {
-  res.status(404).send({ msg: "route does not exist" });
-});
-
-app.use((err, req, res, next) => {
-  // if () {
-  res.status(404).send({ msg: "Not Found" });
-  // } else {
-  //   next(err)
-  // }
-});
-
-app.use((err, req, res, next) => {
-  res.status(500).send({ msg: "Internal Server Error" });
-});
+app.all("/*", routeNotExist);
+app.use(badRequest);
+app.use(notFound);
+app.use(noContent);
+app.use(unprocessableEntity);
+app.use(serverError);
 
 module.exports = app;
