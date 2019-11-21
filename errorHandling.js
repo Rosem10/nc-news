@@ -2,9 +2,14 @@ exports.routeNotExist = (req, res, next) => {
   res.status(404).send({ msg: "route does not exist" });
 };
 
-exports.badRequest = (err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Bad Request" });
+exports.psqlErrors = (err, req, res, next) => {
+  console.log(err);
+  const codes = {
+    "22P02": { status: 400, msg: "Bad Request" },
+    "23502": { status: 404, msg: "Not Found" }
+  };
+  if (codes[err.code]) {
+    res.status(codes[err.code].status).send({ msg: codes[err.code].msg });
   } else {
     next(err);
   }

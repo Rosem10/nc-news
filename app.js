@@ -2,7 +2,7 @@ const express = require("express");
 const apiRouter = require("./Routes/apiRouter");
 const {
   routeNotExist,
-  badRequest,
+  psqlErrors,
   notFound,
   serverError,
   noContent,
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 app.all("/*", routeNotExist);
-app.use(badRequest);
+app.use(psqlErrors);
 app.use(notFound);
 app.use(noContent);
 app.use(unprocessableEntity);

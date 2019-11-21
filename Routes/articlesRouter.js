@@ -10,6 +10,6 @@ articlesRouter
   .get(sendArticleObjectById)
   .patch(sendUpdatedVotesObject);
 
-//articlesRouter.route("/:articleId/comments").post(sendComment);
+articlesRouter.route("/:articleId/comments").post(sendComment);
 
 module.exports = articlesRouter;

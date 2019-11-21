@@ -18,6 +18,16 @@ const getUpdatedVotesObject = (inc_votes, articleId) => {
     .returning("*");
 };
 
-const addComment = () => {};
+const addComment = (article_id, comment) => {
+  return connection
+    .insert({
+      author: comment.username,
+      article_id: article_id,
+      body: comment.body,
+      created_at: new Date().toDateString()
+    })
+    .into("comments")
+    .returning("*");
+};
 
 module.exports = { getArticleObjectById, getUpdatedVotesObject, addComment };

@@ -112,11 +112,51 @@ describe("/api", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send({
-          butter_bridge: "A new comment"
+          username: "butter_bridge",
+          body: "A new comment"
         })
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
+          expect(body.comment.body).to.equal("A new comment");
+          expect(body.comment.author).to.equal("butter_bridge");
+        });
+    });
+    it("POST 404 and returns an error message when comment is submitted to article_id that doesn't exist", () => {
+      return request(app)
+        .post("/api/articles/666/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+    it("POST 404 and returns an error message when object submitted is missing information", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+    it("POST 404 and returns an error message when username submitted doesn't exist", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "buster_bridge" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+    it("POST 400 and error message when Article id is invalid type", () => {
+      return request(app)
+        .post("/api/articles/something/comments")
+        .send({
+          username: "butter_bridge",
+          body: "A new comment"
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Request");
         });
     });
   });

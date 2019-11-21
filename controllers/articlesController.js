@@ -38,6 +38,11 @@ const sendUpdatedVotesObject = (req, res, next) => {
 };
 
 const sendComment = (req, res, next) => {
-  addComment();
+  const { articleId } = req.params;
+  const comment = req.body;
+
+  addComment(articleId, comment)
+    .then(comment => res.status(200).send({ comment: comment[0] }))
+    .catch(next);
 };
 module.exports = { sendArticleObjectById, sendUpdatedVotesObject, sendComment };
