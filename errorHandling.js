@@ -3,10 +3,11 @@ exports.routeNotExist = (req, res, next) => {
 };
 
 exports.psqlErrors = (err, req, res, next) => {
-  console.log(err);
   const codes = {
     "22P02": { status: 400, msg: "Bad Request" },
-    "23502": { status: 404, msg: "Not Found" }
+    "23502": { status: 404, msg: "Not Found" },
+    "23503": { status: 404, msg: "Not Found" },
+    "42703": { status: 400, msg: "Bad Request" }
   };
   if (codes[err.code]) {
     res.status(codes[err.code].status).send({ msg: codes[err.code].msg });
@@ -25,7 +26,6 @@ exports.notFound = (err, req, res, next) => {
 
 exports.noContent = (err, req, res, next) => {
   if (err.status === 204) {
-    console.log(err.status);
     res.status(404).send({ msg: "Not Found" });
     res.status(204).send({ msg: "No Content" });
   } else {
@@ -36,7 +36,7 @@ exports.noContent = (err, req, res, next) => {
 exports.unprocessableEntity = (err, req, res, next) => {
   if (err.status === 422) {
     res.status(422).send({ msg: "Unprocessable Entity" });
-  }
+  } else next(err);
 };
 
 exports.serverError = (err, req, res, next) => {

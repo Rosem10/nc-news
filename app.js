@@ -13,7 +13,8 @@ const app = express();
 app.use(express.json());
 app.use("/api", apiRouter);
 
-app.all("/*", routeNotExist);
+app.all("/*", (req, res, next) => res.status(404).send("Route not found"));
+
 app.use(psqlErrors);
 app.use(notFound);
 app.use(noContent);
