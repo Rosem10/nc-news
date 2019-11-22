@@ -1,9 +1,17 @@
-const getUpdatedCommentsVotes = (comment_id, inc_votes) => {
-  console.log(comment_id, inc_votes);
-  return connection("articles")
-    .where("comments.comment_id")
-    .from("commets")
-    .returning("*");
+const connection = require("../db/connection");
+
+const getUpdatedCommentVotes = (comment_id, inc_votes) => {
+  return connection("comments")
+    .where("comment_id", "=", comment_id)
+    .increment("votes", inc_votes)
+    .returning("*")
+    .then(response => response);
 };
 
-module.exports = getUpdatedCommentsVotes;
+const removeComment = comment_id => {
+  return connection("comments")
+    .where("comment_id", comment_id)
+    .del();
+};
+
+module.exports = { getUpdatedCommentVotes, removeComment };

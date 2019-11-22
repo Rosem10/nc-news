@@ -436,16 +436,48 @@ describe("/api", () => {
         });
     });
   });
-});
 
-describe("comments", () => {
-  xit("PATCH 200 and updates a comment's vote count by the amount indicated in the passed object", () => {
-    return request(app)
-      .patch("/api/comments/1")
-      .send({ inc_votes: 4 })
-      .expect(200)
-      .then(({ body }) => {
-        console.log(body);
-      });
+  describe("comments", () => {
+    it("PATCH 200 and updates a comment's vote count by the amount indicated in the passed object", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 4 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments[0].votes).to.equal(20);
+        });
+    });
+    it("PATCH 200 and returns an unaltered array when passed additional values to patch", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: 4, LeedsUnited: 5 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments[0]).to.eql({
+            comment_id: 2,
+            author: "butter_bridge",
+            article_id: 1,
+            votes: 18,
+            created_at: "Tue Nov 22 2016",
+            body:
+              "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+          });
+        });
+    });
+    it("PATCH 404 and returns error message when passed an object to an article_id that doesn't exist", () => {
+      return request(app)
+        .patch("/api/comments/21222")
+        .send({ inc_votes: 4 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+
+    it("PATCH 200 and deletes the comment relating to the passed comment_id", () => {
+      return request(app)
+        .delete("/api/comments/2")
+        .expect(204);
+    });
   });
 });
