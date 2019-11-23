@@ -34,7 +34,8 @@ const sendUpdatedVotesObject = (req, res, next) => {
           message: "UnprocessableEntity"
         });
       }
-      res.status(200).send({ article });
+      const articleObj = { ...article };
+      res.status(200).send({ article: articleObj[0] });
     })
     .catch(next);
 };

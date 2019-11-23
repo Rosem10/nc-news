@@ -30,7 +30,7 @@ const addComment = (article_id, comment) => {
     .returning("*");
 };
 
-const fetchAllComments = (articleId, column = "comment_id", order = "asc") => {
+const fetchAllComments = (articleId, column = "comment_id", order = "desc") => {
   return connection
     .select("*")
     .from("comments")

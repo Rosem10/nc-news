@@ -1,6 +1,5 @@
 const topicsRouter = require("express").Router();
 const sendAllTopics = require("../controllers/topicsController");
-const send405error = require("../errorHandling");
 
 topicsRouter
   .route("/")

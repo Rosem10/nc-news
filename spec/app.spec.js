@@ -71,6 +71,22 @@ describe("/api", () => {
           expect(body.article.comment_count).to.equal("2");
         });
     });
+    it("GET 405 and error message for method that isn't allowed on /articles route", () => {
+      return request(app)
+        .patch("/api/articles")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method Not Allowed");
+        });
+    });
+    it("GET 405 and error message for method not allowed on /articles/:articleId route", () => {
+      return request(app)
+        .put("/api/articles/1")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method Not Allowed");
+        });
+    });
     it("GET 404 and error message for article that doesn't exist", () => {
       //will not give us an error, will give an empty array
       return request(app)
@@ -94,7 +110,9 @@ describe("/api", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article[0].votes).to.equal(101);
+          expect(body.article.votes).to.equal(101);
+          const array = Array.isArray(body.article);
+          expect(array).to.equal(false);
         });
     });
     it("PATCH 200 and unchanged error message if no 'inc_votes' included in the request", () => {
@@ -103,7 +121,7 @@ describe("/api", () => {
         .send({})
         .expect(200)
         .then(({ body }) => {
-          expect(body.article[0].votes).to.equal(100);
+          expect(body.article.votes).to.equal(100);
         });
     });
     it("PATCH 400 and error message if wrong data type included as inc_votes: value", () => {
@@ -194,7 +212,7 @@ describe("/api", () => {
         .get("/api/articles/5/comments?sort_by=votes")
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments).to.be.sortedBy("votes", { ascending: true });
+          expect(body.comments).to.be.sortedBy("votes", { descending: true });
         });
     });
     it("GET 200 and orders the response according to the order query passed", () => {
@@ -294,6 +312,21 @@ describe("/api", () => {
             expect(article.author).to.equal("icellusedkars")
           );
         });
+    });
+    it("GET 404 and error message when passed an author that doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?author=icellusedjars")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+
+    xit("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
+      return request(app)
+        .get("/api/articles?author=lurker")
+        .expect(200)
+        .then(({ body }) => console.log(body));
     });
     it("GET 200 and filters the values by topic specified in query", () => {
       return request(app)

@@ -7,16 +7,27 @@ const {
   sendAllArticles
 } = require("../controllers/articlesController");
 
-articlesRouter.route("/").get(sendAllArticles);
+articlesRouter
+  .route("/")
+  .get(sendAllArticles)
+  .all((req, res, next) => {
+    res.status(405).send({ msg: "Method Not Allowed" });
+  });
 
 articlesRouter
   .route("/:articleId")
   .get(sendArticleObjectById)
-  .patch(sendUpdatedVotesObject);
+  .patch(sendUpdatedVotesObject)
+  .all((req, res, next) => {
+    res.status(405).send({ msg: "Method Not Allowed" });
+  });
 
 articlesRouter
   .route("/:articleId/comments")
   .get(sendAllComments)
-  .post(sendComment);
+  .post(sendComment)
+  .all((req, res, next) => {
+    res.status(405).send({ msg: "Method Not Allowed" });
+  });
 
 module.exports = articlesRouter;
