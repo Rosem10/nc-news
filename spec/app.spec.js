@@ -12,6 +12,7 @@ chai.use(chaiSorted);
 describe("/api", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
+
   describe("/topics", () => {
     it("GET 200: responds with an array of topics", () => {
       return request(app)
@@ -22,7 +23,17 @@ describe("/api", () => {
           expect(body.topics[0]).to.contain.keys("slug", "description");
         });
     });
+    it("GET 405 and error message if request made to an method that doesn't exist", () => {
+      return request(app)
+        .patch("/api/topics")
+        .send({ name: "Graham" })
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method Not Allowed");
+        });
+    });
   });
+
   describe("/users", () => {
     it("GET 200, returns the requested user object, dependent on the username passed", () => {
       return request(app)
@@ -436,7 +447,6 @@ describe("/api", () => {
         });
     });
   });
-
   describe("comments", () => {
     it("PATCH 200 and updates a comment's vote count by the amount indicated in the passed object", () => {
       return request(app)
