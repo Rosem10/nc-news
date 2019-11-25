@@ -13,6 +13,15 @@ describe("/api", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
+  xit("GET 405 and error message when request made for Method that is not defined", () => {
+    return request(app)
+      .delete("/api")
+      .expect(405)
+      .then(({ body }) => {
+        expect(body.msg).to.equal("Method Not Allowed");
+      });
+  });
+
   describe("/topics", () => {
     it("GET 200: responds with an array of topics", () => {
       return request(app)
@@ -63,6 +72,7 @@ describe("/api", () => {
           expect(body).to.be.an("object");
         });
     });
+
     it("GET 200 and responds with an object including a count of all the comments that have a matching article_id to this article", () => {
       return request(app)
         .get("/api/articles/9")
@@ -73,7 +83,7 @@ describe("/api", () => {
     });
     it("GET 405 and error message for method that isn't allowed on /articles route", () => {
       return request(app)
-        .patch("/api/articles")
+        .put("/api/articles")
         .expect(405)
         .then(({ body }) => {
           expect(body.msg).to.equal("Method Not Allowed");
@@ -115,7 +125,16 @@ describe("/api", () => {
           expect(array).to.equal(false);
         });
     });
-    it("PATCH 200 and unchanged error message if no 'inc_votes' included in the request", () => {
+    it("PATCH 200 and unchanged response if patch request made with no info in it", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 0 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).to.equal(100);
+        });
+    });
+    it("PATCH 200 and unchanged response if no 'inc_votes' included in the request", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({})
@@ -155,21 +174,29 @@ describe("/api", () => {
           expect(body.comment.author).to.equal("butter_bridge");
         });
     });
+    it("GET 405 and returns an error message when method requested is not defined", () => {
+      return request(app)
+        .put("/api/articles/1/comments")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method Not Allowed");
+        });
+    });
     it("POST 404 and returns an error message when comment is submitted to article_id that doesn't exist", () => {
       return request(app)
         .post("/api/articles/666/comments")
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.msg).to.equal("Not Found");
+          expect(body.msg).to.equal("Bad Request");
         });
     });
     it("POST 404 and returns an error message when object submitted is missing information", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send({ username: "butter_bridge" })
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.msg).to.equal("Not Found");
+          expect(body.msg).to.equal("Bad Request");
         });
     });
     it("POST 404 and returns an error message when username submitted doesn't exist", () => {
@@ -209,7 +236,7 @@ describe("/api", () => {
     });
     it("GET 200 and sorts response according to sort_by query passed", () => {
       return request(app)
-        .get("/api/articles/5/comments?sort_by=votes")
+        .get("/api/articles/1/comments?sort_by=votes")
         .expect(200)
         .then(({ body }) => {
           expect(body.comments).to.be.sortedBy("votes", { descending: true });
@@ -217,10 +244,12 @@ describe("/api", () => {
     });
     it("GET 200 and orders the response according to the order query passed", () => {
       return request(app)
-        .get("/api/articles/1/comments?sort_by=votes&&order_by=desc")
+        .get("/api/articles/1/comments?order=asc")
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments).to.be.sortedBy("votes", { descending: true });
+          expect(body.comments).to.be.sortedBy("created_at", {
+            descending: false
+          });
         });
     });
     it("GET 400 and error message when receiving an invalid article_id type", () => {
@@ -314,6 +343,7 @@ describe("/api", () => {
         });
     });
     it("GET 404 and error message when passed an author that doesn't exist", () => {
+      //not sure how to separate this from author that exists but has no articles
       return request(app)
         .get("/api/articles?author=icellusedjars")
         .expect(404)
@@ -328,6 +358,7 @@ describe("/api", () => {
         .expect(200)
         .then(({ body }) => console.log(body));
     });
+
     it("GET 200 and filters the values by topic specified in query", () => {
       return request(app)
         .get("/api/articles?topic=cats")
@@ -487,7 +518,10 @@ describe("/api", () => {
         .send({ inc_votes: 4 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments[0].votes).to.equal(20);
+          expect(body.comment.votes).to.equal(20);
+          const commentsArray = Array.isArray(body.comment);
+          expect(commentsArray).to.equal(false);
+          expect(body).to.contain.keys("comment");
         });
     });
     it("PATCH 200 and returns an unaltered array when passed additional values to patch", () => {
@@ -496,7 +530,7 @@ describe("/api", () => {
         .send({ inc_votes: 4, LeedsUnited: 5 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments[0]).to.eql({
+          expect(body.comment).to.eql({
             comment_id: 2,
             author: "butter_bridge",
             article_id: 1,
@@ -505,6 +539,15 @@ describe("/api", () => {
             body:
               "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
           });
+        });
+    });
+    it("PATCH 400 and returns error message when passed an in_votes value that doesn't exist", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: "Rocketship" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Request");
         });
     });
     it("PATCH 404 and returns error message when passed an object to an article_id that doesn't exist", () => {
@@ -516,11 +559,60 @@ describe("/api", () => {
           expect(body.msg).to.equal("Not Found");
         });
     });
-
+    it("PATCH 200 and sends unchanged comment when sent a body with no inc_votes value", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ name: "Rocketship" })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).to.eql({
+            comment_id: 2,
+            author: "butter_bridge",
+            article_id: 1,
+            votes: 15,
+            created_at: "Tue Nov 22 2016",
+            body:
+              "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+          });
+        });
+    });
+    it("PATCH 405 and returns an error message when method requested is not defined", () => {
+      return request(app)
+        .put("/api/comments/1")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method Not Allowed");
+        });
+    });
+    it("PATCH 400 and returns an error message when passed an invalid comment_id", () => {
+      return request(app)
+        .patch("/api/comments/Rocketship")
+        .send({ inc_votes: 4 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Request");
+        });
+    });
     it("PATCH 200 and deletes the comment relating to the passed comment_id", () => {
       return request(app)
         .delete("/api/comments/2")
         .expect(204);
+    });
+    it("PATCH 404 and returns an error message if the requested comment to be deleted doesn't exist", () => {
+      return request(app)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+    it("PATCH 400 and returns an error messaage when passed a comment_id of an invalid type", () => {
+      return request(app)
+        .delete("/api/comments/notNumber")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Request");
+        });
     });
   });
 });

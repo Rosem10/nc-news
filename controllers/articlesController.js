@@ -31,7 +31,7 @@ const sendUpdatedVotesObject = (req, res, next) => {
       if (lengthOfInc_Votes > 1) {
         return Promise.reject({
           status: 422,
-          message: "UnprocessableEntity"
+          message: "Unprocessable Entity"
         });
       }
       const articleObj = { ...article };
@@ -52,7 +52,7 @@ const sendComment = (req, res, next) => {
 const sendAllComments = (req, res, next) => {
   const { articleId } = req.params;
   const column = req.query.sort_by;
-  const order = req.query.order_by;
+  const order = req.query.order;
   fetchAllComments(articleId, column, order)
     .then(comments => {
       if (comments.length === 0) {
@@ -61,14 +61,15 @@ const sendAllComments = (req, res, next) => {
           message: "Not Found"
         });
       }
+
       res.status(200).send({ comments });
     })
     .catch(next);
 };
 
 const sendAllArticles = (req, res, next) => {
-  const { sort_by, order_by, author, topic } = req.query;
-  getAllArticles(sort_by, order_by, author, topic)
+  const { sort_by, order, author, topic } = req.query;
+  getAllArticles(sort_by, order, author, topic)
     .then(articles => {
       if (articles.length === 0) {
         return Promise.reject({

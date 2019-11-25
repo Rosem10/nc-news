@@ -30,7 +30,7 @@ const addComment = (article_id, comment) => {
     .returning("*");
 };
 
-const fetchAllComments = (articleId, column = "comment_id", order = "desc") => {
+const fetchAllComments = (articleId, column = "created_at", order = "DESC") => {
   return connection
     .select("*")
     .from("comments")
@@ -41,7 +41,7 @@ const fetchAllComments = (articleId, column = "comment_id", order = "desc") => {
 
 const getAllArticles = (
   sort_by = "created_at",
-  order_by = "DESC",
+  order = "DESC",
   author,
   topic
 ) => {
@@ -53,7 +53,7 @@ const getAllArticles = (
       .from("articles")
       .leftJoin("comments", "comments.article_id", "articles.article_id")
       .groupBy("articles.article_id")
-      .orderBy(sort_by, order_by)
+      .orderBy(sort_by, order)
       .returning("*");
   }
   if (topic) {
@@ -64,7 +64,7 @@ const getAllArticles = (
       .from("articles")
       .leftJoin("comments", "comments.article_id", "articles.article_id")
       .groupBy("articles.article_id")
-      .orderBy(sort_by, order_by)
+      .orderBy(sort_by, order)
       .returning("*");
   }
   if (!author && !topic) {
@@ -74,7 +74,7 @@ const getAllArticles = (
       .from("articles")
       .leftJoin("comments", "comments.article_id", "articles.article_id")
       .groupBy("articles.article_id")
-      .orderBy(sort_by, order_by)
+      .orderBy(sort_by, order)
       .returning("*");
   }
 };

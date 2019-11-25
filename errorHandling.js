@@ -5,7 +5,7 @@ exports.routeNotExist = (req, res, next) => {
 exports.psqlErrors = (err, req, res, next) => {
   const codes = {
     "22P02": { status: 400, msg: "Bad Request" },
-    "23502": { status: 404, msg: "Not Found" },
+    "23502": { status: 400, msg: "Bad Request" },
     "23503": { status: 404, msg: "Not Found" },
     "42703": { status: 400, msg: "Bad Request" }
   };

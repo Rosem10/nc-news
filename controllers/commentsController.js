@@ -15,14 +15,26 @@ const sendUpdatedCommentVotes = (req, res, next) => {
           msg: "Not Found"
         });
       }
-      res.status(200).send({ comments });
+      const commentsObj = { ...comments };
+      res.status(200).send({ comment: commentsObj[0] });
     })
     .catch(next);
 };
 
 const deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
-  removeComment(comment_id).then(res.sendStatus(204));
+  removeComment(comment_id)
+    .then(comment => {
+      if (!comment) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not Found"
+        });
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch(next);
 };
 
 module.exports = { sendUpdatedCommentVotes, deleteComment };

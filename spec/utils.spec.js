@@ -45,7 +45,7 @@ describe("formatDates", () => {
     const actual = formatDates(list);
     const expected = [
       {
-        title: "Living in the shadow of a great man",
+        title: "Living in the shadow of a great man",  
         topic: "mitch",
         author: "butter_bridge",
         body: "I find this existence challenging",
