@@ -30,7 +30,7 @@ const addComment = (article_id, comment) => {
     .returning("*");
 };
 
-const fetchAllComments = (articleId, column = "created_at", order = "DESC") => {
+const fetchAllComments = (articleId, column = "created_at", order = "desc") => {
   return connection
     .select("*")
     .from("comments")
@@ -41,7 +41,7 @@ const fetchAllComments = (articleId, column = "created_at", order = "DESC") => {
 
 const getAllArticles = (
   sort_by = "created_at",
-  order = "DESC",
+  order = "desc",
   author,
   topic
 ) => {

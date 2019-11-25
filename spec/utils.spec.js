@@ -7,7 +7,7 @@ const {
 } = require("../db/utils/utils");
 
 describe("formatDates", () => {
-  it("returns a single object with a correctly formatted date, when passed an array", () => {
+  it.only("returns a single object with a correctly formatted date, when passed an array", () => {
     const list = [
       {
         title: "Living in the shadow of a great man",

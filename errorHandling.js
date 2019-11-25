@@ -1,3 +1,6 @@
+exports.methodNotAllowed = (req, res, next) => {
+  res.status(405).send({ msg: "Method Not Allowed" });
+};
 exports.routeNotExist = (req, res, next) => {
   res.status(404).send({ msg: "route does not exist" });
 };

@@ -13,7 +13,7 @@ describe("/api", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
-  xit("GET 405 and error message when request made for Method that is not defined", () => {
+  it("GET 405 and error message when request made for Method that is not defined", () => {
     return request(app)
       .delete("/api")
       .expect(405)
@@ -342,17 +342,18 @@ describe("/api", () => {
           );
         });
     });
-    it("GET 404 and error message when passed an author that doesn't exist", () => {
+    it.only("GET 404 and error message when passed an author that doesn't exist", () => {
       //not sure how to separate this from author that exists but has no articles
       return request(app)
         .get("/api/articles?author=icellusedjars")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).to.equal("Not Found");
+          // expect(body.msg).to.equal("Not Found");
+          console.log(body)
         });
     });
 
-    xit("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
+    it("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
       return request(app)
         .get("/api/articles?author=lurker")
         .expect(200)
