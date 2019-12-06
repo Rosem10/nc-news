@@ -15,10 +15,9 @@ exports.seed = function(knex) {
       return Promise.all([topicsInsertions, usersInsertions]);
     })
     .then(() => {
-      const formattedArticles = formatDates(articleData);
       return knex("articles")
-        .insert(formattedArticles)
-        .returning("*");
+        .insert(formatDates(articleData))
+        .returning("*")
       /* 
       
       Your article data is currently in the incorrect format and will violate your SQL schema. 
@@ -37,7 +36,6 @@ exports.seed = function(knex) {
       
       You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
       */
-
       const articleRef = makeRefObj(articleRows);
       const formattedComments = formatComments(commentData, articleRef);
       return knex("comments").insert(formattedComments);

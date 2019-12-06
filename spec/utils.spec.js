@@ -19,14 +19,16 @@ describe("formatDates", () => {
       }
     ];
     const actual = formatDates(list);
-    const reformattedDate = new Date(1542284514171).toDateString();
+    // console.log(actual)
+    const reformattedDate = new Date(1542284514171)
+    //console.log(reformattedDate)
     expect(actual).to.eql([
       {
         title: "Living in the shadow of a great man",
         topic: "mitch",
         author: "butter_bridge",
         body: "I find this existence challenging",
-        created_at: `${reformattedDate}`,
+        created_at: 2018-11-15T12:21:54.171Z,
         votes: 100
       }
     ]);

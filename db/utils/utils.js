@@ -2,9 +2,9 @@ exports.formatDates = list => {
   list.map(item => {
     const date = item.created_at;
     delete item.created_at;
-    item.created_at = new Date(date).toDateString();
+    item.created_at = new Date(date)
   });
-  return list;
+return list
 };
 
 exports.makeRefObj = list => {

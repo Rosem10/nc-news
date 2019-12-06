@@ -13,7 +13,7 @@ exports.up = function(knex) {
       .integer("votes")
       .notNullable()
       .defaultTo(0);
-    commentsTable.string("created_at").notNullable();
+    commentsTable.timestamp("created_at").notNullable();
     commentsTable.text("body").notNullable();
   });
 };

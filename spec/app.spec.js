@@ -98,7 +98,6 @@ describe("/api", () => {
         });
     });
     it("GET 404 and error message for article that doesn't exist", () => {
-      //will not give us an error, will give an empty array
       return request(app)
         .get("/api/articles/666")
         .expect(404)
@@ -244,11 +243,11 @@ describe("/api", () => {
     });
     it("GET 200 and orders the response according to the order query passed", () => {
       return request(app)
-        .get("/api/articles/1/comments?order=asc")
+        .get("/api/articles/1/comments?")
         .expect(200)
         .then(({ body }) => {
           expect(body.comments).to.be.sortedBy("created_at", {
-            descending: false
+            descending: true
           });
         });
     });
@@ -301,9 +300,6 @@ describe("/api", () => {
             "votes",
             "comment_count"
           );
-          expect(body.articles[0].comment_count).to.equal("0");
-          expect(body.articles[0].votes).to.be.a("number");
-          expect(body.articles[5].comment_count).to.equal("13");
         });
     });
     it("*GET 200 and responds with articles ordered according to the column passed in as the sort_by query", () => {
@@ -332,6 +328,16 @@ describe("/api", () => {
           expect(body.articles).to.be.sortedBy("votes", { descending: true });
         });
     });
+    it("GET 200 and accepts and order_by query which alters the result returned when passed ascending", () => {
+      return request(app)
+        .get("/api/articles?sort_by=created_at&&order=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.sortedBy("created_at", {
+            descending: false
+          });
+        });
+    });
     it("GET 200 and accepts an author query, which filters the values by username specified in the query", () => {
       return request(app)
         .get("/api/articles?author=icellusedkars")
@@ -342,18 +348,17 @@ describe("/api", () => {
           );
         });
     });
-    it.only("GET 404 and error message when passed an author that doesn't exist", () => {
+    it("GET 404 and error message when passed an author that doesn't exist", () => {
       //not sure how to separate this from author that exists but has no articles
       return request(app)
         .get("/api/articles?author=icellusedjars")
         .expect(404)
         .then(({ body }) => {
-          // expect(body.msg).to.equal("Not Found");
-          console.log(body)
+          expect(body.msg).to.equal("Not Found");
         });
     });
 
-    it("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
+    it.only("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
       return request(app)
         .get("/api/articles?author=lurker")
         .expect(200)
@@ -377,75 +382,14 @@ describe("/api", () => {
         .then(({ body }) => {
           expect(body.articles).to.eql([
             {
-              article_id: 10,
-              title: "Seven inspirational thought leaders from Manchester UK",
-              body: "Who are we kidding, there is only one, and it's Mitch!",
-              votes: 0,
-              topic: "mitch",
-              author: "rogersop",
-              created_at: "Wed Nov 24 1982",
-              comment_count: "0"
-            },
-            {
-              article_id: 3,
-              title: "Eight pug gifs that remind me of mitch",
-              body: "some gifs",
-              votes: 0,
-              topic: "mitch",
-              author: "icellusedkars",
-              created_at: "Wed Nov 17 2010",
-              comment_count: "0"
-            },
-            {
-              article_id: 12,
-              title: "Moustache",
-              body: "Have you seen the size of that thing?",
-              votes: 0,
-              topic: "mitch",
-              author: "butter_bridge",
-              created_at: "Tue Nov 26 1974",
-              comment_count: "0"
-            },
-            {
-              article_id: 5,
-              title: "UNCOVERED: catspiracy to bring down democracy",
-              body: "Bastet walks amongst us, and the cats are taking arms!",
-              votes: 0,
-              topic: "cats",
-              author: "rogersop",
-              created_at: "Tue Nov 19 2002",
-              comment_count: "2"
-            },
-            {
-              article_id: 8,
-              title: "Does Mitch predate civilisation?",
-              body:
-                "Archaeologists have uncovered a gigantic statue from the dawn of humanity, and it has an uncanny resemblance to Mitch. Surely I am not the only person who can see this?!",
-              votes: 0,
-              topic: "mitch",
-              author: "icellusedkars",
-              created_at: "Thu Nov 22 1990",
-              comment_count: "0"
-            },
-            {
               article_id: 1,
               title: "Living in the shadow of a great man",
               body: "I find this existence challenging",
               votes: 100,
               topic: "mitch",
               author: "butter_bridge",
-              created_at: "Thu Nov 15 2018",
+              created_at: "2018-11-15T12:21:54.171Z",
               comment_count: "13"
-            },
-            {
-              article_id: 9,
-              title: "They're not exactly dogs, are they?",
-              body: "Well? Think about it.",
-              votes: 0,
-              topic: "mitch",
-              author: "butter_bridge",
-              created_at: "Sun Nov 23 1986",
-              comment_count: "2"
             },
             {
               article_id: 2,
@@ -455,18 +399,17 @@ describe("/api", () => {
               votes: 0,
               topic: "mitch",
               author: "icellusedkars",
-              created_at: "Sun Nov 16 2014",
+              created_at: "2014-11-16T12:21:54.171Z",
               comment_count: "0"
             },
             {
-              article_id: 11,
-              title: "Am I a cat?",
-              body:
-                "Having run out of ideas for articles, I am staring at the wall blankly, like a cat. Does this make me a cat?",
+              article_id: 3,
+              title: "Eight pug gifs that remind me of mitch",
+              body: "some gifs",
               votes: 0,
               topic: "mitch",
               author: "icellusedkars",
-              created_at: "Sat Nov 25 1978",
+              created_at: "2010-11-17T12:21:54.171Z",
               comment_count: "0"
             },
             {
@@ -477,18 +420,18 @@ describe("/api", () => {
               votes: 0,
               topic: "mitch",
               author: "rogersop",
-              created_at: "Sat Nov 18 2006",
+              created_at: "2006-11-18T12:21:54.171Z",
               comment_count: "0"
             },
             {
-              article_id: 7,
-              title: "Z",
-              body: "I was hungry.",
+              article_id: 5,
+              title: "UNCOVERED: catspiracy to bring down democracy",
+              body: "Bastet walks amongst us, and the cats are taking arms!",
               votes: 0,
-              topic: "mitch",
-              author: "icellusedkars",
-              created_at: "Mon Nov 21 1994",
-              comment_count: "0"
+              topic: "cats",
+              author: "rogersop",
+              created_at: "2002-11-19T12:21:54.171Z",
+              comment_count: "2"
             },
             {
               article_id: 6,
@@ -497,8 +440,70 @@ describe("/api", () => {
               votes: 0,
               topic: "mitch",
               author: "icellusedkars",
-              created_at: "Fri Nov 20 1998",
+              created_at: "1998-11-20T12:21:54.171Z",
               comment_count: "1"
+            },
+            {
+              article_id: 7,
+              title: "Z",
+              body: "I was hungry.",
+              votes: 0,
+              topic: "mitch",
+              author: "icellusedkars",
+              created_at: "1994-11-21T12:21:54.171Z",
+              comment_count: "0"
+            },
+            {
+              article_id: 8,
+              title: "Does Mitch predate civilisation?",
+              body:
+                "Archaeologists have uncovered a gigantic statue from the dawn of humanity, and it has an uncanny resemblance to Mitch. Surely I am not the only person who can see this?!",
+              votes: 0,
+              topic: "mitch",
+              author: "icellusedkars",
+              created_at: "1990-11-22T12:21:54.171Z",
+              comment_count: "0"
+            },
+            {
+              article_id: 9,
+              title: "They're not exactly dogs, are they?",
+              body: "Well? Think about it.",
+              votes: 0,
+              topic: "mitch",
+              author: "butter_bridge",
+              created_at: "1986-11-23T12:21:54.171Z",
+              comment_count: "2"
+            },
+            {
+              article_id: 10,
+              title: "Seven inspirational thought leaders from Manchester UK",
+              body: "Who are we kidding, there is only one, and it's Mitch!",
+              votes: 0,
+              topic: "mitch",
+              author: "rogersop",
+              created_at: "1982-11-24T12:21:54.171Z",
+              comment_count: "0"
+            },
+            {
+              article_id: 11,
+              title: "Am I a cat?",
+              body:
+                "Having run out of ideas for articles, I am staring at the wall blankly, like a cat. Does this make me a cat?",
+              votes: 0,
+              topic: "mitch",
+              author: "icellusedkars",
+              created_at: "1978-11-25T12:21:54.171Z",
+              comment_count: "0"
+            },
+            {
+              article_id: 12,
+              title: "Moustache",
+              body: "Have you seen the size of that thing?",
+              votes: 0,
+              topic: "mitch",
+              author: "butter_bridge",
+              created_at: "1974-11-26T12:21:54.171Z",
+              comment_count: "0"
             }
           ]);
         });
@@ -536,7 +541,7 @@ describe("/api", () => {
             author: "butter_bridge",
             article_id: 1,
             votes: 18,
-            created_at: "Tue Nov 22 2016",
+            created_at: "2016-11-22T00:00:00.000Z",
             body:
               "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
           });
@@ -571,7 +576,7 @@ describe("/api", () => {
             author: "butter_bridge",
             article_id: 1,
             votes: 15,
-            created_at: "Tue Nov 22 2016",
+            created_at: "2016-11-22T00:00:00.000Z",
             body:
               "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
           });
