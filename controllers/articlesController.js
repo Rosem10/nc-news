@@ -71,15 +71,10 @@ const sendAllArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
   getAllArticles(sort_by, order, author, topic)
     .then(articles => {
-      if (articles.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Not Found"
-        });
-      }
       res.status(200).send({ articles });
     })
     .catch(next);
+
 };
 
 module.exports = {

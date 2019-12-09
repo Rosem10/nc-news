@@ -45,38 +45,85 @@ const getAllArticles = (
   author,
   topic
 ) => {
-  if (author) {
-    return connection
-      .select("articles.*")
-      .where("articles.author", author)
-      .count({ comment_count: "comments.article_id" })
-      .from("articles")
-      .leftJoin("comments", "comments.article_id", "articles.article_id")
-      .groupBy("articles.article_id")
-      .orderBy(sort_by, order)
-      .returning("*");
-  }
-  if (topic) {
-    return connection
-      .select("articles.*")
-      .where("articles.topic", topic)
-      .count({ comment_count: "comments.article_id" })
-      .from("articles")
-      .leftJoin("comments", "comments.article_id", "articles.article_id")
-      .groupBy("articles.article_id")
-      .orderBy(sort_by, order)
-      .returning("*");
-  }
-  if (!author && !topic) {
-    return connection
-      .select("articles.*")
-      .count({ comment_count: "comments.article_id" })
-      .from("articles")
-      .leftJoin("comments", "comments.article_id", "articles.article_id")
-      .groupBy("articles.article_id")
-      .orderBy(sort_by, order)
-      .returning("*");
-  }
+  return connection
+    .select("articles.*")
+    .count({ comment_count: "comments.article_id" })
+    .from("articles")
+    .leftJoin("comments", "comments.article_id", "articles.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by, order)
+    .modify(query => {
+      if (author) query.where({ "articles.author": author });
+      if (topic) query.where({ "articles.topic": topic });
+    })
+    .then(articles => {
+      const checkTopicExists = topic
+        ? doesItExist(topic, "topics", "topics.slug")
+        : null;
+      const checkAuthorExists = author
+        ? doesItExist(author, "users", "users.username")
+        : null;
+      return Promise.all([checkTopicExists, checkAuthorExists, articles]).then(
+        ([checkTopicExists, checkAuthorExists, articles]) => {
+          if (checkAuthorExists === false) {
+            return Promise.reject({
+              status: 404,
+              msg: "Not Found"
+            });
+          }
+          if (checkTopicExists === false) {
+            return Promise.reject({
+              status: 404,
+              msg: "Not Found"
+            });
+          } else {
+            return articles;
+          }
+        }
+      );
+    });
+};
+
+const doesItExist = (query, table, column) => {
+  return connection
+    .select("*")
+    .from(table)
+    .where(column, query)
+    .then(returned => {
+      if (returned.length === 0) {
+        return false;
+      } else return true;
+    });
+  // if (author) {
+  //   doesAuthorExist = connection
+  //     .select("username")
+  //     .from("users")
+  //     .where("username", author)
+  //     .then(users => {
+  //       if (users.length === 0) {
+  //         return Promise.reject({
+  //           status: 404,
+  //           msg: "Not Found"
+  //         });
+  //       }
+  //     });
+  //   if (topic) {
+  //     doesTopicExist = connection
+  //       .select("slug")
+  //       .from("topics")
+  //       .where("slug", topic)
+  //       .then(users => {
+  //         if (users.length === 0) {
+  //           return Promise.reject({
+  //             status: 404,
+  //             msg: "Not Found"
+  //           });
+  //         }
+  //       });
+
+  //     return Promise.all([doesAuthorExist, doesTopicExist]);
+  //   }
+  // }
 };
 
 module.exports = {

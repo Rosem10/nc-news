@@ -358,11 +358,10 @@ describe("/api", () => {
         });
     });
 
-    it.only("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
+    it("GET 200 and returns an unfiltered array if passed an author that exists, but has no associate articles", () => {
       return request(app)
         .get("/api/articles?author=lurker")
-        .expect(200)
-        .then(({ body }) => console.log(body));
+        .expect(200);
     });
 
     it("GET 200 and filters the values by topic specified in query", () => {
@@ -508,7 +507,7 @@ describe("/api", () => {
           ]);
         });
     });
-    it("GET 404 and returns error message if passed a query value that doesn't exist", () => {
+    it("GET 404 and returns error message if passed a topic value that doesn't exist", () => {
       return request(app)
         .get("/api/articles?topic=otters")
         .expect(404)
@@ -547,7 +546,7 @@ describe("/api", () => {
           });
         });
     });
-    it("PATCH 400 and returns error message when passed an in_votes value that doesn't exist", () => {
+    it("PATCH 400 and returns error message when passed an inc_votes value that doesn't exist", () => {
       return request(app)
         .patch("/api/comments/2")
         .send({ inc_votes: "Rocketship" })
@@ -575,7 +574,7 @@ describe("/api", () => {
             comment_id: 2,
             author: "butter_bridge",
             article_id: 1,
-            votes: 15,
+            votes: 14,
             created_at: "2016-11-22T00:00:00.000Z",
             body:
               "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
