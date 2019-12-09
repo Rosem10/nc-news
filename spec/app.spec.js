@@ -6,7 +6,6 @@ const app = require("../app");
 const connection = require("../db/connection");
 const chai = require("chai");
 const chaiSorted = require("chai-sorted");
-
 chai.use(chaiSorted);
 
 describe("/api", () => {
@@ -46,7 +45,7 @@ describe("/api", () => {
   describe("/users", () => {
     it("GET 200, returns the requested user object, dependent on the username passed", () => {
       return request(app)
-        .get("/api/users/icellusedkars") // give us the object matching the username
+        .get("/api/users/icellusedkars")
         .expect(200)
         .then(({ body }) => {
           expect(body.user.username).to.eql("icellusedkars");
@@ -600,12 +599,12 @@ describe("/api", () => {
           expect(body.msg).to.equal("Bad Request");
         });
     });
-    it("PATCH 200 and deletes the comment relating to the passed comment_id", () => {
+    it("DELETE 200 and deletes the comment relating to the passed comment_id", () => {
       return request(app)
         .delete("/api/comments/2")
         .expect(204);
     });
-    it("PATCH 404 and returns an error message if the requested comment to be deleted doesn't exist", () => {
+    it("DELETE 404 and returns an error message if the requested comment to be deleted doesn't exist", () => {
       return request(app)
         .delete("/api/comments/999")
         .expect(404)
@@ -613,12 +612,19 @@ describe("/api", () => {
           expect(body.msg).to.equal("Not Found");
         });
     });
-    it("PATCH 400 and returns an error messaage when passed a comment_id of an invalid type", () => {
+    it("DELETE 400 and returns an error messaage when passed a comment_id of an invalid type", () => {
       return request(app)
         .delete("/api/comments/notNumber")
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).to.equal("Bad Request");
+        });
+    });
+    it("GET 400 and responds with a JSON describing all available endpoints", () => {
+      return request(app)
+        .get("/api")
+        .then(({ body }) => {
+          expect(body.endpoints).to.be.an("object");
         });
     });
   });

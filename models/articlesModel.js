@@ -109,36 +109,6 @@ const doesItExist = (query, table, column) => {
         return false;
       } else return true;
     });
-  // if (author) {
-  //   doesAuthorExist = connection
-  //     .select("username")
-  //     .from("users")
-  //     .where("username", author)
-  //     .then(users => {
-  //       if (users.length === 0) {
-  //         return Promise.reject({
-  //           status: 404,
-  //           msg: "Not Found"
-  //         });
-  //       }
-  //     });
-  //   if (topic) {
-  //     doesTopicExist = connection
-  //       .select("slug")
-  //       .from("topics")
-  //       .where("slug", topic)
-  //       .then(users => {
-  //         if (users.length === 0) {
-  //           return Promise.reject({
-  //             status: 404,
-  //             msg: "Not Found"
-  //           });
-  //         }
-  //       });
-
-  //     return Promise.all([doesAuthorExist, doesTopicExist]);
-  //   }
-  // }
 };
 
 module.exports = {
