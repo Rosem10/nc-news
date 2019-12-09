@@ -224,13 +224,7 @@ describe("/api", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments[0]).to.contain.keys(
-            "comment_id",
-            "author",
-            "votes",
-            "created_at",
-            "body"
-          );
+          expect(body).to.be.a("object");
         });
     });
     it("GET 200 and sorts response according to sort_by query passed", () => {
@@ -267,6 +261,14 @@ describe("/api", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).to.equal("Not Found");
+        });
+    });
+    it("GET 200 and empty array for a valid article_id with no attached comments", () => {
+      return request(app)
+        .get("/api/articles/12/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).to.eql([]);
         });
     });
     it("GET 400 and error message when receiving an invalid column value to sort by", () => {

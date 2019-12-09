@@ -55,15 +55,11 @@ const sendAllComments = (req, res, next) => {
   const order = req.query.order;
   fetchAllComments(articleId, column, order)
     .then(comments => {
-      if (comments.length === 0) {
-        return Promise.reject({
-          status: 404,
-          message: "Not Found"
-        });
+      if (comments) {
+        res.status(200).send({ comments: comments });
       }
-
-      res.status(200).send({ comments });
     })
+
     .catch(next);
 };
 
@@ -74,7 +70,6 @@ const sendAllArticles = (req, res, next) => {
       res.status(200).send({ articles });
     })
     .catch(next);
-
 };
 
 module.exports = {

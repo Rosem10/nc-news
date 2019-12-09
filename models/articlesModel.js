@@ -36,7 +36,22 @@ const fetchAllComments = (articleId, column = "created_at", order = "desc") => {
     .from("comments")
     .where("article_id", articleId)
     .orderBy(column, order)
-    .returning("*");
+    .then(comments => {
+      const checkArticleExists = articleId
+        ? doesItExist(articleId, "articles", "articles.article_id")
+        : null;
+      return Promise.all([checkArticleExists, comments]);
+    })
+    .then(response => {
+      if (response[0] === false) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not Found"
+        });
+      } else {
+        return response[1];
+      }
+    });
 };
 
 const getAllArticles = (
