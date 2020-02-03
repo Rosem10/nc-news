@@ -365,13 +365,13 @@ describe("/api", () => {
         .expect(200);
     });
 
-    it("GET 200 and filters the values by topic specified in query", () => {
+    it.only("GET 200 and filters the values by topic specified in query", () => {
       return request(app)
-        .get("/api/articles?topic=cats")
+        .get("/api/articles?topic=mitch")
         .expect(200)
         .then(({ body }) => {
           body.articles.forEach(article =>
-            expect(article.topic).to.equal("cats")
+            expect(article.topic).to.equal("mitch")
           );
         });
     });
